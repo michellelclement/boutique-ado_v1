@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-import django.contrib import messages
+from django.contrib import messages
+from django.db.models import Q
 from .models import Product
 # Create your views here.
 
@@ -9,6 +10,7 @@ def all_products(request):
 
     products = Product.objects.all()
     # Returns all products from DB
+    query = None
 
     if request.GET:
         if 'q' in request.GET:
@@ -17,11 +19,15 @@ def all_products(request):
                 messages.error(request, "You didn't enter any search criteria!")
                 return redirect(reverse('products'))
 
+            queries = Q(name__icontains=query) | Q(description__icontains=query)
+            products = products.filter(queries)
+
     context = {
         'products': products,
     }
     # Products will now be available in templates
     return render(request, 'products/products.html', context)
+
 
 def product_detail(request, product_id):
     """ A view to show product details """
