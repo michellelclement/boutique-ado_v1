@@ -12,8 +12,24 @@ def all_products(request):
     # Returns all products from DB
     query = None
     categories = None
+    sort = None
+    direction = None
 
     if request.GET:
+        if 'sort' in request.GET:
+            sortkey = request.GET['sort']
+            # to allow case-insensitive sorting
+            if sortkey == 'name':
+                sortkey = 'lower_name'
+                products = products.annotate(lower_name=Lower('name'))
+            sort = sortkey
+            # Check if direction is in sort
+            if 'direction' in request.GET:
+                direction = request.GET['direction']
+                if direction == 'desc':
+                    sortkey = f'-{sortkey}'
+            products = products.order_by(sortkey)
+
         # Check whether it exists in request.get
         if 'category' in request.GET:
             categories = request.GET['category'].split(',')
@@ -27,11 +43,13 @@ def all_products(request):
 
             queries = Q(name__icontains=query) | Q(description__icontains=query)
             products = products.filter(queries)
+    current_sorting = f'{sort}_{direction}'
 
     context = {
         'products': products,
         'search_term': query,
         'current_categories': categories,
+        'current_sorting': current_sorting,
     }
     # Products will now be available in templates
     return render(request, 'products/products.html', context)
