@@ -18,11 +18,14 @@ def all_products(request):
     if request.GET:
         if 'sort' in request.GET:
             sortkey = request.GET['sort']
+            sort = sortkey
             # to allow case-insensitive sorting
             if sortkey == 'name':
                 sortkey = 'lower_name'
                 products = products.annotate(lower_name=Lower('name'))
-            sort = sortkey
+            # Sorting by product name rather than ID
+            if sortkey == 'category':
+                sortkey = 'category__name'
             # Check if direction is in sort
             if 'direction' in request.GET:
                 direction = request.GET['direction']
