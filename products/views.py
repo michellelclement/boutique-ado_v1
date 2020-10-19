@@ -36,6 +36,7 @@ def all_products(request):
 
         # Check whether it exists in request.get
         if 'category' in request.GET:
+            print("CATEGORY PRESENT")
             categories = request.GET['category'].split(',')
             products = products.filter(category__name__in=categories)
 
