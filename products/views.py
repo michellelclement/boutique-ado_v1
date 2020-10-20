@@ -12,7 +12,7 @@ def all_products(request):
     products = Product.objects.all()
     # Returns all products from DB
     query = None
-    categories = None
+    categories = Category.objects.all()
     sort = None
     direction = None
 
@@ -39,7 +39,7 @@ def all_products(request):
             print("CATEGORY PRESENT")
             categories = request.GET['category'].split(',')
             products = products.filter(category__name__in=categories)
-
+            categories = Category.objects.filter(name__in=categories) 
         if 'q' in request.GET:
             query = request.GET['q']
             if not query:
