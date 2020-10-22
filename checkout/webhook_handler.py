@@ -1,5 +1,10 @@
 from django.http import HttpResponse
 
+from .models import Order, OrderLineItem
+from products.models import Product
+
+import json
+import time
 
 class StripeWH_Handler:
     """Handle Stripe webhooks"""
@@ -20,7 +25,7 @@ class StripeWH_Handler:
         Handle the payment_intent.succeeded webhook from Stripe
         """
         intent = event.data.object
-        pid - intent.id
+        pid = intent.id
         bag = intent.metadata.bag
         save_info = intent.metadata.save_info
 
@@ -33,7 +38,7 @@ class StripeWH_Handler:
             if value == "":
                 shipping_details.address[field] = None
 
-                order_exists = False
+        order_exists = False
         attempt = 1
         while attempt <= 5:
             try:
